@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#17365D" />
+  <title>RyanOS</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --navy:#17365D; --blue:#1F4E78; --bg:#f4f7fb; --card:#fff;
+      --text:#1f2937; --muted:#6b7280; --green:#0f8a4b; --red:#b42318;
+      --yellow:#fff4cc; --border:#d8e1ec;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:var(--navy);color:white;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+    header h1{font-size:20px;margin:0}
+    header small{opacity:.85}
+    .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 56px)}
+    nav{background:#102a49;color:white;padding:12px;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
+    nav button{width:100%;border:0;background:transparent;color:white;text-align:left;padding:12px;border-radius:10px;margin:3px 0;font-size:15px}
+    nav button.active,nav button:hover{background:#285d8f}
+    main{padding:20px;max-width:1400px;width:100%;margin:0 auto}
+    .page{display:none}.page.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(23,54,93,.06)}
+    .card h3{margin:0 0 10px;font-size:15px;color:var(--muted)}
+    .metric{font-size:28px;font-weight:750}
+    .good{color:var(--green)} .bad{color:var(--red)}
+    .section-title{font-size:24px;margin:0 0 16px}
+    table{width:100%;border-collapse:collapse;background:white}
+    th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;font-size:14px}
+    th{background:#edf3f9;color:#234}
+    input,select,button.action,textarea{font:inherit;border:1px solid #b9c7d6;border-radius:8px;padding:9px;background:white}
+    input[type=number]{width:130px}
+    button.action{background:var(--blue);color:white;border:0;cursor:pointer}
+    button.secondary{background:white;color:var(--blue);border:1px solid var(--blue)}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .notice{background:var(--yellow);padding:12px 14px;border-radius:10px;margin:12px 0}
+    .progress{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}.progress span{display:block;height:100%;background:var(--green)}
+    .form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+    textarea{min-height:90px;width:100%}
+    .small{font-size:12px;color:var(--muted)}
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+      nav{position:static;height:auto;display:flex;overflow:auto;gap:4px;padding:8px}
+      nav button{min-width:max-content}
+      .grid,.grid.two,.form-grid{grid-template-columns:1fr 1fr}
+      main{padding:14px}
+    }
+    @media(max-width:600px){.grid,.grid.two,.form-grid{grid-template-columns:1fr}.metric{font-size:24px}}
+  </style>
+</head>
+<body>
+<header>
+  <div><h1>RyanOS</h1><small>Private financial and life planning prototype</small></div>
+  <button class="action secondary" onclick="exportData()">Export</button>
+</header>
+<div class="layout">
+<nav id="nav"></nav>
+<main>
+  <section id="home" class="page active"></section>
+  <section id="money" class="page"></section>
+  <section id="transactions" class="page"></section>
+  <section id="goals" class="page"></section>
+  <section id="retirement" class="page"></section>
+  <section id="networth" class="page"></section>
+  <section id="lifeplans" class="page"></section>
+  <section id="settings" class="page"></section>
+</main>
+</div>
+<script>
+const defaults = {
+  settings:{
+    yellowhead:5428.78, province:5147.32, wcb:1352.34, investing:2600, annualBills:1200, chores:173,
+    locBalance:23000, locRate:5.19, locMonths:24, currentInvestments:520000, currentAge:52, retireAge:58,
+    returnRate:7, inflation:2.5, retirementSpending:72000, wifePension:3200, wifeAgeDiff:7, wifeRetireAge:55,
+    userCpp65:1308.21, userCpp70:1857.66, userCppStart:70, wifeCpp60:878, wifeCpp65:1372, wifeCpp70:1948,
+    wifeCppStart:65, inheritance:300000, taxRate:18, home:650000, ns1:100000, ns2:40000, vehicles:25000,
+    boat:18000, camper:15000, cash:0, ccDebt:0
+  },
+  budget:[
+    ["Groceries",1400],["Dining",700],["Transportation",550],["Vehicle",500],["Home & Garden",600],
+    ["Utilities",600],["Subscriptions",175],["Shopping & Personal",550],["Pets",150],["Entertainment",200],
+    ["Alcohol",250],["Boat & Outdoor",300],["Travel",500],["Medical",75],["Education",70],
+    ["Donations & Family",75],["Miscellaneous",300]
+  ],
+  goals:[
+    {name:"Son's car",target:6000,current:0,monthly:500,priority:1},
+    {name:"LOC",target:23000,current:23000,monthly:0,priority:2},
+    {name:"Emergency fund",target:4000,current:0,monthly:150,priority:3},
+    {name:"Garmin",target:1300,current:0,monthly:100,priority:4},
+    {name:"Fence",target:6000,current:0,monthly:0,priority:5}
+  ],
+  transactions:[],
+  lifePlans:[
+    {name:"Future home build",target:500000,saved:0,targetYear:2032},
+    {name:"Vehicle replacement",target:45000,saved:0,targetYear:2029},
+    {name:"Caribbean trip",target:15000,saved:0,targetYear:2028},
+    {name:"Desolation Sound",target:6000,saved:0,targetYear:2027}
+  ]
+};
+let data = JSON.parse(localStorage.getItem("ryanos-data")||"null") || defaults;
+const pages=[["home","Home"],["money","Money"],["transactions","Transactions"],["goals","Goals & Debt"],["retirement","Retirement"],["networth","Net Worth"],["lifeplans","Life Plans"],["settings","Settings"]];
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat("en-CA",{style:"currency",currency:"CAD",maximumFractionDigits:0}).format(Number(n||0));
+const pct=n=>`${Number(n||0).toFixed(1)}%`;
+function save(){localStorage.setItem("ryanos-data",JSON.stringify(data)); render();}
+function pmt(rate,nper,pv){rate/=1200; return rate===0?pv/nper:(rate*pv)/(1-Math.pow(1+rate,-nper));}
+function nav(){
+  $("nav").innerHTML=pages.map(([id,label],i)=>`<button class="${i===0?'active':''}" onclick="show('${id}',this)">${label}</button>`).join("");
+}
+function show(id,btn){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  $(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+}
+function totals(){
+  const s=data.settings;
+  const income=s.yellowhead+s.province+s.wcb;
+  const spending=data.budget.reduce((a,x)=>a+Number(x[1]),0);
+  const locPayment=pmt(s.locRate,s.locMonths,s.locBalance);
+  const goalFunding=data.goals.filter(g=>g.name!=="LOC").reduce((a,g)=>a+Number(g.monthly),0);
+  const surplus=income-spending-s.investing-s.annualBills-locPayment-s.chores-goalFunding;
+  const assets=s.home+s.ns1+s.ns2+s.vehicles+s.boat+s.camper+s.cash+s.currentInvestments;
+  const debt=s.locBalance+s.ccDebt;
+  return {income,spending,locPayment,goalFunding,surplus,assets,debt,networth:assets-debt};
+}
+function renderHome(){
+ const t=totals();
+ $("home").innerHTML=`
+ <h2 class="section-title">Home</h2>
+ <div class="grid">
+  <div class="card"><h3>Monthly Income</h3><div class="metric">${money(t.income)}</div></div>
+  <div class="card"><h3>Monthly Surplus</h3><div class="metric ${t.surplus>=0?'good':'bad'}">${money(t.surplus)}</div></div>
+  <div class="card"><h3>Net Worth</h3><div class="metric">${money(t.networth)}</div></div>
+  <div class="card"><h3>Investments</h3><div class="metric">${money(data.settings.currentInvestments)}</div></div>
+ </div>
+ <div class="grid two" style="margin-top:14px">
+  <div class="card"><h3>Current priorities</h3>
+   ${data.goals.sort((a,b)=>a.priority-b.priority).map(g=>{
+      const progress=g.name==="LOC"?(1-g.current/g.target)*100:g.current/g.target*100;
+      return `<p><strong>${g.priority}. ${g.name}</strong> — ${money(g.current)} / ${money(g.target)}</p><div class="progress"><span style="width:${Math.max(0,Math.min(100,progress))}%"></span></div>`;
+   }).join("")}
+  </div>
+  <div class="card"><h3>Next actions</h3>
+   <div class="notice">Import a full month of chequing and Mastercard transactions.</div>
+   <p>Pay approximately <strong>${money(t.locPayment)}</strong> per month to clear the LOC in ${data.settings.locMonths} months.</p>
+   <p>Update cash, investment, and goal balances monthly.</p>
+   <p>Recheck retirement at age ${data.settings.retireAge} after calibration.</p>
+  </div>
+ </div>`;
+}
+function renderMoney(){
+ const t=totals();
+ $("money").innerHTML=`<h2 class="section-title">Money</h2>
+ <div class="grid">
+  <div class="card"><h3>Budgeted Spending</h3><div class="metric">${money(t.spending)}</div></div>
+  <div class="card"><h3>LOC Payment</h3><div class="metric">${money(t.locPayment)}</div></div>
+  <div class="card"><h3>Goal Funding</h3><div class="metric">${money(t.goalFunding)}</div></div>
+  <div class="card"><h3>Monthly Result</h3><div class="metric ${t.surplus>=0?'good':'bad'}">${money(t.surplus)}</div></div>
+ </div>
+ <div class="card" style="margin-top:14px"><table><thead><tr><th>Category</th><th>Monthly Budget</th></tr></thead><tbody>
+ ${data.budget.map((x,i)=>`<tr><td>${x[0]}</td><td><input type="number" value="${x[1]}" onchange="data.budget[${i}][1]=Number(this.value);save()"></td></tr>`).join("")}
+ </tbody></table></div>`;
+}
+function renderTransactions(){
+ $("transactions").innerHTML=`<h2 class="section-title">Transactions</h2>
+ <div class="toolbar"><input type="file" id="csvFile" accept=".csv"><button class="action" onclick="importCsv()">Import CSV</button><button class="action secondary" onclick="clearTransactions()">Clear</button></div>
+ <div class="notice">CSV import expects columns resembling Date, Description, and Amount. Review categories after import.</div>
+ <div class="card"><table><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Category</th><th>Include?</th></tr></thead><tbody>
+ ${data.transactions.slice(0,200).map((x,i)=>`<tr><td>${x.date||""}</td><td>${x.description||""}</td><td>${money(x.amount)}</td><td><input value="${x.category||"Miscellaneous"}" onchange="data.transactions[${i}].category=this.value;save()"></td><td><select onchange="data.transactions[${i}].include=this.value;save()"><option ${x.include==="Yes"?"selected":""}>Yes</option><option ${x.include!=="Yes"?"selected":""}>No</option></select></td></tr>`).join("")}
+ </tbody></table></div>`;
+}
+function categorize(desc){
+ desc=(desc||"").toUpperCase();
+ const rules=[["SAVE ON","Groceries"],["SAFEWAY","Groceries"],["TIM HORTONS","Dining"],["MCDONALD","Dining"],["SHELL","Transportation"],["PETRO","Transportation"],["HOME DEPOT","Home & Garden"],["ROGERS","Utilities"],["SHAW","Utilities"],["NETFLIX","Subscriptions"],["SPOTIFY","Subscriptions"],["AMZN","Shopping & Personal"],["LIQUOR","Alcohol"],["MARINE","Boat & Outdoor"],["WESTJET","Travel"],["EXPEDIA","Travel"],["LOC","Debt"],["YELLOWHEAD","Income"],["PROVINCE","Income"],["WCB","Income"]];
+ return (rules.find(r=>desc.includes(r[0]))||["","Miscellaneous"])[1];
+}
+function parseCsv(text){
+ const lines=text.trim().split(/\r?\n/); const headers=lines.shift().split(",").map(x=>x.replace(/^"|"$/g,"").trim().toLowerCase());
+ const idx=(names)=>headers.findIndex(h=>names.some(n=>h.includes(n)));
+ const di=idx(["date"]), xi=idx(["description","details","merchant"]), ai=idx(["amount"]);
+ return lines.map(line=>{
+   const cols=(line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g)||[]).map(x=>x.replace(/^"|"$/g,"").replace(/""/g,'"'));
+   const desc=cols[xi]||""; const amount=Number((cols[ai]||"0").replace(/[$,]/g,""));
+   return {date:cols[di]||"",description:desc,amount,category:categorize(desc),include:amount<0?"Yes":"No"};
+ });
+}
+function importCsv(){
+ const f=$("csvFile").files[0]; if(!f)return alert("Choose a CSV file first.");
+ const r=new FileReader(); r.onload=()=>{data.transactions=data.transactions.concat(parseCsv(r.result));save();}; r.readAsText(f);
+}
+function clearTransactions(){if(confirm("Clear all imported transactions?")){data.transactions=[];save();}}
+function renderGoals(){
+ const t=totals();
+ data.goals.find(g=>g.name==="LOC").monthly=Math.round(t.locPayment*100)/100;
+ $("goals").innerHTML=`<h2 class="section-title">Goals & Debt</h2>
+ <div class="card"><table><thead><tr><th>Priority</th><th>Goal</th><th>Target</th><th>Current</th><th>Monthly</th><th>Months</th></tr></thead><tbody>
+ ${data.goals.sort((a,b)=>a.priority-b.priority).map((g,i)=>{
+   const months=g.monthly>0?Math.ceil(Math.max(g.target-g.current,0)/g.monthly):"—";
+   return `<tr><td>${g.priority}</td><td>${g.name}</td><td>${money(g.target)}</td><td><input type="number" value="${g.current}" onchange="data.goals[${i}].current=Number(this.value);save()"></td><td><input type="number" value="${g.monthly}" onchange="data.goals[${i}].monthly=Number(this.value);save()"></td><td>${months}</td></tr>`;
+ }).join("")}
+ </tbody></table></div>`;
+}
+function projection(age){
+ const s=data.settings, years=age-s.currentAge, inv=s.currentInvestments*Math.pow(1+s.returnRate/100,years)+s.investing*12*((Math.pow(1+s.returnRate/100,years)-1)/(s.returnRate/100));
+ const spend=s.retirementSpending*Math.pow(1+s.inflation/100,years);
+ const wifeAge=age-s.wifeAgeDiff;
+ const pension=wifeAge>=s.wifeRetireAge?s.wifePension*12:0;
+ const wcb=age<65?s.wcb*12:0;
+ const cpp=age>=s.userCppStart?(s.userCppStart===70?s.userCpp70:s.userCpp65)*12:0;
+ const wifeCpp=wifeAge>=s.wifeCppStart?(s.wifeCppStart===60?s.wifeCpp60:s.wifeCppStart===70?s.wifeCpp70:s.wifeCpp65)*12:0;
+ const portfolio=inv*.04;
+ return {age,inv,spend,income:pension+wcb+cpp+wifeCpp+portfolio,gap:pension+wcb+cpp+wifeCpp+portfolio-spend};
+}
+function renderRetirement(){
+ const ages=[55,56,57,58,59,60,62,65];
+ $("retirement").innerHTML=`<h2 class="section-title">Retirement</h2>
+ <div class="notice">This is a planning model, not tax or investment advice. Update assumptions in Settings.</div>
+ <div class="card"><table><thead><tr><th>Retire Age</th><th>Projected Investments</th><th>Inflation-Adjusted Spending</th><th>Estimated Income</th><th>Surplus / Gap</th></tr></thead><tbody>
+ ${ages.map(a=>{const x=projection(a);return `<tr><td>${a}</td><td>${money(x.inv)}</td><td>${money(x.spend)}</td><td>${money(x.income)}</td><td class="${x.gap>=0?'good':'bad'}">${money(x.gap)}</td></tr>`}).join("")}
+ </tbody></table></div>`;
+}
+function renderNetWorth(){
+ const t=totals(),s=data.settings;
+ const assets=[["Primary home",s.home],["NS property 1",s.ns1],["NS property 2",s.ns2],["Investments",s.currentInvestments],["Cash",s.cash],["Vehicles",s.vehicles],["Boat",s.boat],["Camper / trailer",s.camper]];
+ $("networth").innerHTML=`<h2 class="section-title">Net Worth</h2><div class="grid">
+ <div class="card"><h3>Total Assets</h3><div class="metric">${money(t.assets)}</div></div>
+ <div class="card"><h3>Total Debt</h3><div class="metric">${money(t.debt)}</div></div>
+ <div class="card"><h3>Net Worth</h3><div class="metric">${money(t.networth)}</div></div>
+ </div><div class="card" style="margin-top:14px"><table><thead><tr><th>Asset</th><th>Value</th></tr></thead><tbody>${assets.map(x=>`<tr><td>${x[0]}</td><td>${money(x[1])}</td></tr>`).join("")}</tbody></table></div>`;
+}
+function renderLifePlans(){
+ $("lifeplans").innerHTML=`<h2 class="section-title">Life Plans</h2>
+ <div class="card"><table><thead><tr><th>Plan</th><th>Target</th><th>Saved</th><th>Target Year</th><th>Progress</th></tr></thead><tbody>
+ ${data.lifePlans.map((p,i)=>`<tr><td>${p.name}</td><td><input type="number" value="${p.target}" onchange="data.lifePlans[${i}].target=Number(this.value);save()"></td><td><input type="number" value="${p.saved}" onchange="data.lifePlans[${i}].saved=Number(this.value);save()"></td><td><input type="number" value="${p.targetYear}" onchange="data.lifePlans[${i}].targetYear=Number(this.value);save()"></td><td>${pct(Math.min(100,p.saved/p.target*100))}</td></tr>`).join("")}
+ </tbody></table></div>`;
+}
+function renderSettings(){
+ const s=data.settings;
+ const fields=[
+ ["yellowhead","Yellowhead monthly net income"],["province","Province monthly net income"],["wcb","WorkSafeBC monthly income"],
+ ["investing","Retirement investing"],["annualBills","Annual-bills reserve"],["locBalance","LOC balance"],["locRate","LOC rate (%)"],
+ ["locMonths","LOC payoff months"],["currentInvestments","Current investments"],["currentAge","Current age"],["retireAge","Target retirement age"],
+ ["returnRate","Expected return (%)"],["inflation","Inflation (%)"],["retirementSpending","Annual retirement spending"],
+ ["wifePension","Wife monthly pension"],["wifeAgeDiff","Wife age difference"],["wifeRetireAge","Wife retirement age"],
+ ["userCpp65","User CPP at 65"],["userCpp70","User CPP at 70"],["userCppStart","User CPP start age"],
+ ["wifeCpp60","Wife CPP at 60"],["wifeCpp65","Wife CPP at 65"],["wifeCpp70","Wife CPP at 70"],["wifeCppStart","Wife CPP start age"],
+ ["inheritance","Expected inheritance"],["taxRate","Average retirement tax rate (%)"],["home","Primary home value"],["ns1","NS property 1"],
+ ["ns2","NS property 2"],["vehicles","Vehicle value"],["boat","Boat value"],["camper","Camper value"],["cash","Cash accounts"],["ccDebt","Credit-card debt"]
+ ];
+ $("settings").innerHTML=`<h2 class="section-title">Settings</h2><div class="toolbar"><button class="action secondary" onclick="resetData()">Reset to Defaults</button><button class="action" onclick="importData()">Import Backup</button><input type="file" id="jsonFile" accept=".json"></div>
+ <div class="card"><div class="form-grid">${fields.map(([k,l])=>`<label>${l}<input type="number" step="any" value="${s[k]}" onchange="data.settings['${k}']=Number(this.value);save()"></label>`).join("")}</div></div>`;
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="RyanOS-backup.json";a.click();
+}
+function importData(){
+ const f=$("jsonFile").files[0]; if(!f)return alert("Choose a RyanOS JSON backup.");
+ const r=new FileReader();r.onload=()=>{data=JSON.parse(r.result);save();};r.readAsText(f);
+}
+function resetData(){if(confirm("Reset all data to defaults?")){data=JSON.parse(JSON.stringify(defaults));save();}}
+function render(){renderHome();renderMoney();renderTransactions();renderGoals();renderRetirement();renderNetWorth();renderLifePlans();renderSettings();}
+nav();render();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("service-worker.js").catch(()=>{});}
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "RyanOS",
+  "short_name": "RyanOS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#17365D",
+  "description": "Private financial and life planning app prototype."
+}
