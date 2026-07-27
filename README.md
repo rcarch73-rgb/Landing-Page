@@ -1,4 +1,9 @@
-Harbour North Website Version 2.4
+Harbour North — Final Landing Page
 
-This version uses a split hero layout so no text or interface elements are baked into the image.
 Upload index.html to the root of your GitHub Pages repository.
+
+This is a single-file website:
+- Official Harbour North logo embedded
+- New sailboat scene embedded with no text or interface elements
+- Responsive desktop, tablet, and mobile layouts
+- Hero, lifestyle, product, questions, value proposition, CTA, and footer sections
