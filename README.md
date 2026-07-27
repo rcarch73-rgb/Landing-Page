@@ -1,27 +1,20 @@
-# Harbour North Approved Landing Page
+# Harbour North Website — Version 1
 
-This version recreates the approved Harbour North landing-page direction as a working responsive website.
+A simple, responsive first-pass homepage based on the approved lifestyle-and-freedom direction.
 
 ## Included
-
-- Exact Harbour North icon supplied by the owner
-- Responsive desktop, tablet, and mobile layout
-- Scenic sailing hero rendered as native SVG
-- Product feature strip
-- Dashboard preview
-- Retirement report preview
-- Academy, pricing, about, and beta sections
-- Mobile navigation
-- Prototype signup form
+- Official Harbour North icon
+- Full-screen scenic hero
+- Approved tagline
+- Start Free Trial and How It Works calls to action
+- Three-step value proposition
+- Product preview
+- Mobile-responsive styling
 
 ## Preview
+Open `index.html` in any modern browser.
 
-Open `index.html` in a browser.
-
-## Before publishing
-
-- Connect the trial/signup form to the selected email or CRM platform.
-- Replace illustrative dashboard values with approved product screenshots.
-- Add legal pages and final privacy language.
-- Confirm final pricing.
-- Add analytics only after selecting a privacy-compliant setup.
+## Next wiring steps
+- Connect the free-trial buttons to the signup flow
+- Replace the illustrative dashboard with a final product screenshot
+- Add privacy, terms and contact pages before publishing
