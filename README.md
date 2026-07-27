@@ -1,20 +1,15 @@
-# Harbour North Website — Version 1
+# Harbour North Website — Version 2
 
-A simple, responsive first-pass homepage based on the approved lifestyle-and-freedom direction.
+A responsive, GitHub Pages-ready landing page.
 
-## Included
-- Official Harbour North icon
-- Full-screen scenic hero
-- Approved tagline
-- Start Free Trial and How It Works calls to action
-- Three-step value proposition
-- Product preview
-- Mobile-responsive styling
+## Open locally
+Double-click `index.html`.
 
-## Preview
-Open `index.html` in any modern browser.
+## Publish on GitHub Pages
+Upload the contents of this folder to the root of your GitHub Pages repository. Keep the `assets` folder beside `index.html`.
 
-## Next wiring steps
-- Connect the free-trial buttons to the signup flow
-- Replace the illustrative dashboard with a final product screenshot
-- Add privacy, terms and contact pages before publishing
+## Notes
+- Uses the official Harbour North logo asset.
+- Hero image is optimized as WebP.
+- The main hero content is designed to fit within one desktop viewport.
+- Navigation links currently scroll to sections on this page; connect them to future pages when those are built.
