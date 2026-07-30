@@ -1,4 +1,8 @@
-import { supabase } from './supabase.js';
+import { supabase, isSupabaseConfigured } from './supabase.js';
+
+if (!isSupabaseConfigured || !supabase) {
+  console.info('Harbour North cloud save is disabled in local alpha mode.');
+} else {
 
 const TABLE = 'retirement_plans';
 const PLAN_NAME = 'My Retirement Plan';
@@ -158,3 +162,5 @@ supabase.auth.onAuthStateChange((event, session) => {
 });
 
 initialise();
+
+}

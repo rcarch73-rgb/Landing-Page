@@ -1,0 +1,9 @@
+{
+  "name": "harbour-north-foundation-alpha",
+  "version": "0.3.1",
+  "private": true,
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "validate": "node scripts/validate.mjs"
+  }
+}

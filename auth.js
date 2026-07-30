@@ -1,6 +1,17 @@
-import { supabase } from './supabase.js';
+import { supabase, isSupabaseConfigured } from './supabase.js';
 
 const loginUrl = new URL('../login.html', window.location.href);
+
+if (!isSupabaseConfigured || !supabase) {
+  const gate = document.getElementById('hnAuthGate');
+  if (gate) gate.remove();
+  document.documentElement.classList.add('hn-auth-ready');
+  const cloud = document.getElementById('hnCloudStatus');
+  if (cloud) {
+    cloud.textContent = 'Local alpha mode';
+    cloud.title = 'Add app/js/config.js to enable accounts and cloud save.';
+  }
+} else {
 
 function displayName(user) {
   const metadataName = user?.user_metadata?.full_name?.trim();
@@ -86,3 +97,5 @@ supabase.auth.onAuthStateChange((event, session) => {
 });
 
 requireSession().catch(() => window.location.replace(loginUrl.href));
+
+}

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Sign in — Harbour North</title>
+  <meta name="description" content="Sign in to your Harbour North retirement planning account.">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon-192.png" sizes="192x192">
+  <meta name="theme-color" content="#103A56">
+  <style>
+    :root{--navy:#183552;--blue:#2f6f89;--ink:#172331;--muted:#667584;--line:#dce5e9;--bg:#f5f7f7;--ok:#2e7d62;--danger:#b14b4b}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at top right,rgba(47,111,137,.13),transparent 34%),linear-gradient(180deg,#f7f9f9,#edf3f4);min-height:100vh}
+    button,input{font:inherit}.layout{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(420px,.95fr)}
+    .brand-side{padding:64px clamp(32px,6vw,86px);display:flex;flex-direction:column;justify-content:center}.brand{font-weight:900;font-size:23px;color:var(--navy);position:absolute;top:42px}.kicker{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:900;color:var(--blue);margin-bottom:14px}
+    h1{font-family:Georgia,"Times New Roman",serif;color:var(--navy);font-size:clamp(48px,6vw,76px);line-height:.99;letter-spacing:-.055em;margin:0 0 22px;max-width:730px}.brand-side>p{font-size:20px;line-height:1.55;color:#536574;max-width:640px;margin:0}.benefits{display:grid;gap:14px;margin-top:32px;max-width:620px}.benefit{display:grid;grid-template-columns:35px 1fr;gap:12px;align-items:start}.benefit i{width:35px;height:35px;border-radius:11px;background:#e1edef;color:var(--blue);display:grid;place-items:center;font-style:normal;font-weight:900}.benefit strong{display:block;color:var(--navy)}.benefit span{font-size:13px;color:var(--muted);line-height:1.4}
+    .form-side{background:var(--navy);padding:42px clamp(26px,5vw,68px);display:flex;align-items:center;justify-content:center}.card{width:min(470px,100%);background:#fff;border-radius:24px;padding:30px;box-shadow:0 26px 70px rgba(10,29,45,.28)}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:#eef3f4;padding:5px;border-radius:12px;margin-bottom:25px}.tab{border:0;background:transparent;border-radius:9px;padding:11px;font-weight:850;color:var(--muted);cursor:pointer}.tab.active{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(20,48,68,.08)}
+    .panel{display:none}.panel.active{display:block}.panel h2{font-size:29px;color:var(--navy);margin:0 0 7px;letter-spacing:-.035em}.intro{color:var(--muted);line-height:1.5;margin:0 0 23px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:15px}.field label{font-size:14px;font-weight:850}.field input{width:100%;min-height:50px;border:1px solid #cfdade;border-radius:11px;padding:13px 14px}.field input:focus{outline:3px solid rgba(47,111,137,.16);border-color:var(--blue)}
+    .primary,.secondary{width:100%;border:0;border-radius:11px;padding:14px 17px;font-weight:850;cursor:pointer}.primary{background:var(--navy);color:#fff}.primary:disabled{opacity:.65;cursor:wait}.secondary{background:#e9eff1;color:var(--navy);margin-top:10px}.text-button{border:0;background:transparent;color:var(--blue);font-weight:800;cursor:pointer;padding:12px 0 0}.message{display:none;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.45;margin:0 0 17px}.message.show{display:block}.message.error{background:#fff0f0;color:#8c3333}.message.success{background:#eaf6ef;color:#236a52}.fine{font-size:12px;color:var(--muted);line-height:1.45;margin:17px 0 0}.hidden{display:none!important}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.brand-side{display:none}.form-side{min-height:100vh;background:linear-gradient(180deg,#183552,#254c6e);padding:24px}.card{padding:25px}}
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="brand-side">
+      <div class="brand">Harbour North</div>
+      <div class="kicker">Retirement planning for Canadians</div>
+      <h1>Plan retirement with confidence.</h1>
+      <p>Your account keeps your Harbour North plan private, secure and ready wherever you sign in.</p>
+      <div class="benefits">
+        <div class="benefit"><i>✓</i><div><strong>Private by design</strong><span>Your account is protected by Supabase authentication and row-level database security.</span></div></div>
+        <div class="benefit"><i>↻</i><div><strong>Ready for cloud saving</strong><span>This account foundation is the next step toward secure backups and multi-device access.</span></div></div>
+        <div class="benefit"><i>CA</i><div><strong>Built for Canadians</strong><span>Retirement planning focused on Canadian income, tax and benefit rules.</span></div></div>
+      </div>
+    </section>
+
+    <section class="form-side">
+      <div class="card">
+        <div id="standardTabs" class="tabs">
+          <button class="tab active" type="button" data-panel="signin">Sign in</button>
+          <button class="tab" type="button" data-panel="signup">Create account</button>
+        </div>
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+
+        <form id="signin" class="panel active">
+          <h2>Welcome back</h2><p class="intro">Sign in to continue to your retirement plan.</p>
+          <div class="field"><label for="signInEmail">Email</label><input id="signInEmail" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="signInPassword">Password</label><input id="signInPassword" type="password" autocomplete="current-password" minlength="8" required></div>
+          <button class="primary" type="submit">Sign in</button>
+          <button id="forgotButton" class="text-button" type="button">Forgot your password?</button>
+        </form>
+
+        <form id="signup" class="panel">
+          <h2>Create your account</h2><p class="intro">Start with a secure Harbour North account.</p>
+          <div class="field"><label for="fullName">First name</label><input id="fullName" type="text" autocomplete="given-name" required></div>
+          <div class="field"><label for="signUpEmail">Email</label><input id="signUpEmail" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="signUpPassword">Password</label><input id="signUpPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+          <div class="field"><label for="confirmPassword">Confirm password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+          <button class="primary" type="submit">Create account</button>
+          <p class="fine">By creating an account, you agree to Harbour North's terms and privacy policy.</p>
+        </form>
+
+        <form id="forgot" class="panel">
+          <h2>Reset your password</h2><p class="intro">Enter your email and we'll send you a secure reset link.</p>
+          <div class="field"><label for="forgotEmail">Email</label><input id="forgotEmail" type="email" autocomplete="email" required></div>
+          <button class="primary" type="submit">Send reset link</button>
+          <button class="secondary" type="button" data-back-signin>Back to sign in</button>
+        </form>
+
+        <form id="reset" class="panel">
+          <h2>Choose a new password</h2><p class="intro">Enter a new password for your Harbour North account.</p>
+          <div class="field"><label for="newPassword">New password</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+          <div class="field"><label for="newPasswordConfirm">Confirm password</label><input id="newPasswordConfirm" type="password" autocomplete="new-password" minlength="8" required></div>
+          <button class="primary" type="submit">Update password</button>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script type="module">
+    import { supabase, isSupabaseConfigured } from './app/js/supabase.js';
+
+    if (!isSupabaseConfigured || !supabase) {
+      document.body.innerHTML = '<main style="max-width:680px;margin:10vh auto;padding:32px;font-family:system-ui;line-height:1.6;color:#243943"><h1 style="color:#103a56">Account setup is not enabled yet</h1><p>Harbour North is running in local alpha mode. Copy <code>app/js/config.example.js</code> to <code>app/js/config.js</code> and add the Supabase project values.</p><p><a href="./app/index.html">Continue to the local alpha</a></p></main>';
+    } else {
+
+    const panels = [...document.querySelectorAll('.panel')];
+    const tabs = [...document.querySelectorAll('.tab')];
+    const message = document.getElementById('message');
+    const standardTabs = document.getElementById('standardTabs');
+    const appUrl = new URL('./app/', window.location.href);
+
+    function showPanel(id) {
+      panels.forEach(panel => panel.classList.toggle('active', panel.id === id));
+      tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.panel === id));
+      standardTabs.classList.toggle('hidden', !['signin','signup'].includes(id));
+      clearMessage();
+    }
+    function showMessage(text, type='error') { message.textContent=text; message.className=`message show ${type}`; }
+    function clearMessage() { message.textContent=''; message.className='message'; }
+    function busy(form, state, text) { const b=form.querySelector('button[type="submit"]'); if(!b)return; if(state){b.dataset.label=b.textContent;b.textContent=text;b.disabled=true;}else{b.textContent=b.dataset.label||b.textContent;b.disabled=false;} }
+
+    tabs.forEach(tab => tab.addEventListener('click', () => showPanel(tab.dataset.panel)));
+    document.getElementById('forgotButton').addEventListener('click', () => showPanel('forgot'));
+    document.querySelector('[data-back-signin]').addEventListener('click', () => showPanel('signin'));
+
+    document.getElementById('signin').addEventListener('submit', async event => {
+      event.preventDefault(); const form=event.currentTarget; busy(form,true,'Signing in…'); clearMessage();
+      const { error } = await supabase.auth.signInWithPassword({email:signInEmail.value.trim(),password:signInPassword.value});
+      if(error){showMessage(error.message);busy(form,false);return;}
+      const returnTo = new URLSearchParams(location.search).get('returnTo');
+      window.location.replace(returnTo ? new URL(returnTo, location.origin).href : appUrl.href);
+    });
+
+    document.getElementById('signup').addEventListener('submit', async event => {
+      event.preventDefault(); const form=event.currentTarget; clearMessage();
+      if(signUpPassword.value !== confirmPassword.value){showMessage('The passwords do not match.');return;}
+      busy(form,true,'Creating account…');
+      const redirect = new URL('./login.html', window.location.href);
+      const { data, error } = await supabase.auth.signUp({
+        email: signUpEmail.value.trim(), password: signUpPassword.value,
+        options: { data: { full_name: fullName.value.trim() }, emailRedirectTo: redirect.href }
+      });
+      if(error){showMessage(error.message);busy(form,false);return;}
+      if(data.session){window.location.replace(appUrl.href);return;}
+      showMessage('Account created. Check your email and click the confirmation link, then return here to sign in.','success');
+      form.reset(); busy(form,false);
+    });
+
+    document.getElementById('forgot').addEventListener('submit', async event => {
+      event.preventDefault(); const form=event.currentTarget; busy(form,true,'Sending…'); clearMessage();
+      const redirect = new URL('./login.html?mode=reset', window.location.href);
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.value.trim(), { redirectTo: redirect.href });
+      if(error){showMessage(error.message);busy(form,false);return;}
+      showMessage('Password reset email sent. Check your inbox for the secure link.','success'); busy(form,false);
+    });
+
+    document.getElementById('reset').addEventListener('submit', async event => {
+      event.preventDefault(); const form=event.currentTarget; clearMessage();
+      if(newPassword.value !== newPasswordConfirm.value){showMessage('The passwords do not match.');return;}
+      busy(form,true,'Updating…');
+      const { error } = await supabase.auth.updateUser({ password: newPassword.value });
+      if(error){showMessage(error.message);busy(form,false);return;}
+      showMessage('Your password has been updated. Opening Harbour North…','success');
+      setTimeout(() => window.location.replace(appUrl.href), 900);
+    });
+
+    supabase.auth.onAuthStateChange((event) => {
+      if(event === 'PASSWORD_RECOVERY') showPanel('reset');
+    });
+
+    const params = new URLSearchParams(location.search);
+    if(params.get('mode') === 'reset') showPanel('reset');
+    else {
+      const { data } = await supabase.auth.getSession();
+      if(data.session) window.location.replace(appUrl.href);
+    }
+    }
+  </script>
+</body>
+</html>
